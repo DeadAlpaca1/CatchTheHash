@@ -16,10 +16,10 @@ def space(y = 1):
 
 x,y = 40,11
 
-sound = ['gameplay.wav','win.wav','lose.wav','menu.wav','select.wav','enter.wav']
-wave,play = list([0]*6),list([0]*6)
+sound = ['gameplay.wav','win.wav','lose.wav','menu.wav','select.wav','enter.wav','lifelost.wav']
+wave,play = list([0]*7),list([0]*7)
 
-for l in range(6):
+for l in range(7):
     wave[l] = sa.WaveObject.from_wave_file(sound[l])
 
 try:
@@ -30,7 +30,7 @@ try:
         
         counter = 0
         cursor = list([1]*3)
-        flag = list([False]*9)
+        flag = list([False]*8)
         
         mode = ['Easy','Medium','Hard','Insane']
         factor = list([0]*3)
@@ -167,6 +167,8 @@ try:
         
         fpos = list([[0,0]]*factor[2])
         
+        lastmove = ''
+        
         play[0] = wave[0].play()
         
         while True:     # gameplay begins
@@ -175,23 +177,23 @@ try:
             
             newline(3)
             
-            for i in range(y):
-                for j in range(x):
+            for i in range(1,y+1):
+                for j in range(1,x+1):
                     
                     r1 = random.randint(1,5)
                     
-                    if i == ppos[1]-1 and j == ppos[0]-1:
+                    if i == ppos[1] and j == ppos[0]:
                         pwnl(player+" ")
                         continue
                     for k in range(factor[2]):
-                        if i == fpos[k][1]-1 and j == fpos[k][0]-1:
+                        if i == fpos[k][1] and j == fpos[k][0]:
                               pwnl(follower+" ")
                               flag[6] = True
                               break
                     if flag[6] == True:
                         flag[6] = False
                         continue
-                    if i == epos[1]-1 and j == epos[0]-1:
+                    if i == epos[1] and j == epos[0]:
                         if r1 != 1:
                             pwnl('# ')
                             continue
@@ -220,44 +222,51 @@ try:
                 flag[7] = True
                 break
             
-            reset = ppos
+            if ppos in fpos:
+                life -= 1
+                play[6] = wave[6].play()
+                play[6].wait_done()
+            
+            for n1 in range(0,factor[2]-1):
+                fpos[n1] = fpos[n1+1]
+            fpos[factor[2]-1] = ppos
             
             while True:
                 
                 if keyboard.is_pressed('w'):
-                    ppos[1] -= 1
+                    if lastmove == 'down':
+                        continue
+                    ppos = [ppos[0],ppos[1]-1]
+                    lastmove = 'up'
                     if ppos[1] < 1:
                         ppos[1] += y
-                    if ppos == fpos[factor[2]-1]:
-                        ppos[1] += 1
-                        flag[8] = True
                     time.sleep(0.05)
                     break
                 elif keyboard.is_pressed('a'):
-                    ppos[0] -= 1
+                    if lastmove == 'right':
+                        continue
+                    ppos = [ppos[0]-1,ppos[1]]
+                    lastmove = 'left'
                     if ppos[0] < 1:
                         ppos[0] += x
-                    if ppos == fpos[factor[2]-1]:
-                        ppos[0] += 1
-                        flag[8] = True
                     time.sleep(0.05)
                     break
                 elif keyboard.is_pressed('s'):
-                    ppos[1] += 1
+                    if lastmove == 'up':
+                        continue
+                    ppos = [ppos[0],ppos[1]+1]
+                    lastmove = 'down'
                     if ppos[1] > y:
                         ppos[1] -= y
-                    if ppos == fpos[factor[2]-1]:
-                        ppos[1] -= 1
-                        flag[8] = True
                     time.sleep(0.05)
                     break
                 elif keyboard.is_pressed('d'):
-                    ppos[0] += 1
+                    if lastmove == 'left':
+                        continue
+                    ppos = [ppos[0]+1,ppos[1]]
+                    lastmove = 'right'
                     if ppos[0] > x:
                         ppos[0] -= x
-                    if ppos == fpos[factor[2]-1]:
-                        ppos[0] -= 1
-                        flag[8] = True
                     time.sleep(0.05)
                     break
                 elif keyboard.is_pressed('q'):
@@ -265,24 +274,9 @@ try:
                     win = False
                     flag[3] = True
                     break
-                
-            if flag[8] == False:
-                
-                for n in range(factor[2]):
-                    
-                    fpos[n] = fpos[n+1]
-
-                fpos[n] = reset[0:2]
             
-            else:
-                
-                flag[8] = False
-                
             if flag[0] == True:
                 break
-            
-            if ppos in fpos and counter >= factor[2]:
-                life -= 1
             
             rand = random.randint(1,factor[0])
             
