@@ -85,13 +85,13 @@ try:
                     break
                 
             if cursor[0] == 1:
-                factor = [10,100,9]
+                factor = [10,100,14]
             elif cursor[0] == 2:
-                factor = [8,80,14]
+                factor = [8,80,19]
             elif cursor[0] == 3:
-                factor = [6,60,19]
+                factor = [6,60,24]
             elif cursor[0] == 4:
-                factor = [4,40,24]
+                factor = [4,40,29]
             
             while True:     # character selection screen
                 
